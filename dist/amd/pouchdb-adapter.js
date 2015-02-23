@@ -23,6 +23,11 @@ define(
 
           if (change.deleted) {
             var rec = store.recordForId(obj.type, obj.id);
+            // We must react to deletions caused by ourselves and mark them as
+            // comitted because we cannot unload records that are inFlight
+            if (rec.currentState.stateName === 'root.deleted.inFlight') {
+              rec.currentState.didCommit(rec);
+            }
             store.unloadRecord(rec);
           }
         }.bind(this));
